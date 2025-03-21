@@ -1,0 +1,39 @@
+{
+    "info": {
+        "name": "Laravel API Testing",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/login",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "login"]
+                }
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000"
+        }
+    ]
+}
