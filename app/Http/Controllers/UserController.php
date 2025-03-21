@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -53,8 +54,8 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        // Check if user is viewing their own profile or has admin permission
-        if ($user->id != $id && !$user->can('manage users')) {
+        // Check if user is viewing their own profile or has view users permission
+        if ($user->id != $id && !$user->can('view users')) {
             return response()->json([
                 'message' => 'Unauthorized to view this user'
             ], 403);
@@ -77,8 +78,8 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        // Check if user is updating their own profile or has admin permission
-        if ($user->id != $id && !$user->can('manage users')) {
+        // Check if user is updating their own profile or has edit users permission
+        if ($user->id != $id && !$user->can('edit users')) {
             return response()->json([
                 'message' => 'Unauthorized to update this user'
             ], 403);
@@ -103,8 +104,8 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        // Only admin can delete users
-        if (!$user->can('manage users')) {
+        // Only users with delete users permission can delete users
+        if (!$user->can('delete users')) {
             return response()->json([
                 'message' => 'Unauthorized to delete users'
             ], 403);
@@ -127,8 +128,8 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        // Only admin can view all users
-        if (!$user->can('manage users')) {
+        // Only users with view users permission can view all users
+        if (!$user->can('view users')) {
             return response()->json([
                 'message' => 'Unauthorized to view all users'
             ], 403);
@@ -139,6 +140,43 @@ class UserController extends Controller
 
         return response()->json([
             'users' => $result['users']
+        ], 200);
+    }
+
+    public function assignPermissions(Request $request, $id)
+    {
+        $user = Auth::user();
+        
+        // Only users with manage users permission can assign permissions
+        if (!$user->can('manage users')) {
+            return response()->json([
+                'message' => 'Unauthorized to assign permissions'
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'permissions' => ['required', 'array'],
+            'permissions.*' => ['required', 'string']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $result = $this->userService->assignPermissions($id, $request->permissions);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message']
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => $result['message'],
+            'user' => $result['user']
         ], 200);
     }
 }
