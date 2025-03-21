@@ -17,6 +17,12 @@ return new class extends Migration
             $table->unsignedBigInteger('receiver_id');
             $table->decimal('amount', 15, 2);
             $table->enum('status', ['pending', 'completed', 'failed']);
+            $table->foreignId('team_id')->nullable()->constrained('teams')->onDelete('set null');
+            $table->enum('type', ['income', 'expense']);
+            $table->string('description');
+            $table->date('date');
+            $table->string('category');
+            $table->string('reference_number')->nullable()->unique();
             $table->timestamps();
 
             // Since sender and receiver can be either users or companies,

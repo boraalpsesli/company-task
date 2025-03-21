@@ -25,11 +25,19 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    // Company routes
     Route::apiResource('companies', CompanyController::class);
+    Route::get('companies/{id}/statistics', [CompanyController::class, 'statistics']);
+    Route::get('companies/statistics/all', [CompanyController::class, 'allStatistics']);
 
+    // Team routes
     Route::apiResource('teams', TeamController::class);
-    Route::apiResource('transactions', TransactionController::class);
+    Route::get('teams/{id}/statistics', [TeamController::class, 'statistics']);
+    Route::get('teams/statistics/all', [TeamController::class, 'allStatistics']);
     Route::get('teams/{teamId}/transactions', [TransactionController::class, 'teamTransactions']);
+
+    // Transaction routes
+    Route::apiResource('transactions', TransactionController::class);
 });
 
 

@@ -128,4 +128,44 @@ class CompanyController extends Controller
             'message' => $result['message']
         ], 200);
     }
+
+    public function statistics($id)
+    {
+        $user = Auth::user();
+        
+        if (!$user->can('view companies')) {
+            return response()->json([
+                'message' => 'Unauthorized to view company statistics'
+            ], 403);
+        }
+
+        $result = $this->companyService->getStatistics($id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message']
+            ], 404);
+        }
+
+        return response()->json([
+            'statistics' => $result['statistics']
+        ], 200);
+    }
+
+    public function allStatistics()
+    {
+        $user = Auth::user();
+        
+        if (!$user->can('view companies')) {
+            return response()->json([
+                'message' => 'Unauthorized to view company statistics'
+            ], 403);
+        }
+
+        $result = $this->companyService->getAllStatistics();
+
+        return response()->json([
+            'statistics' => $result['statistics']
+        ], 200);
+    }
 } 

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Team;
 use App\Models\Company;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Transaction;
 
 class TeamService
 {
@@ -118,6 +119,77 @@ class TeamService
         return [
             'success' => true,
             'message' => 'Team deleted successfully'
+        ];
+    }
+
+    public function getStatistics($id, $companyId = null)
+    {
+        $team = Team::find($id);
+
+        if (!$team) {
+            return [
+                'success' => false,
+                'message' => 'Team not found'
+            ];
+        }
+
+        // Verify team belongs to the correct company
+        if ($companyId && $team->company_id !== $companyId) {
+            return [
+                'success' => false,
+                'message' => 'Unauthorized to access this team'
+            ];
+        }
+
+        // Base query for transactions
+        $baseQuery = Transaction::where('team_id', $team->id);
+        
+        // Income transactions
+        $incomeQuery = clone $baseQuery;
+        $incomeTransactions = $incomeQuery->where('type', 'income');
+        
+        // Expense transactions
+        $expenseQuery = clone $baseQuery;
+        $expenseTransactions = $expenseQuery->where('type', 'expense');
+        
+        $stats = [
+            'total_users' => $team->users()->count(),
+            'total_transactions' => $baseQuery->count(),
+            'income_transactions' => $incomeTransactions->count(),
+            'expense_transactions' => $expenseTransactions->count(),
+            'total_income' => $incomeTransactions->sum('amount') ?? 0,
+            'total_expenses' => $expenseTransactions->sum('amount') ?? 0,
+        ];
+
+        return [
+            'success' => true,
+            'statistics' => $stats
+        ];
+    }
+
+    public function getAllStatistics($companyId = null)
+    {
+        $query = Team::query();
+        
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+        }
+
+        // Get all teams with their user counts
+        $teams = $query->withCount(['users', 'transactions'])->get();
+        
+        $stats = [
+            'total_teams' => $teams->count(),
+            'total_users' => $teams->sum('users_count'),
+            'teams_with_users' => $teams->where('users_count', '>', 0)->count(),
+            'teams_without_users' => $teams->where('users_count', 0)->count(),
+            'teams_with_transactions' => $teams->where('transactions_count', '>', 0)->count(),
+            'teams_without_transactions' => $teams->where('transactions_count', 0)->count(),
+        ];
+
+        return [
+            'success' => true,
+            'statistics' => $stats
         ];
     }
 } 

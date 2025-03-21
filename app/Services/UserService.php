@@ -53,8 +53,8 @@ class UserService
             'password' => ['required', 'min:8'],
             'name' => ['required', 'string', 'max:255'],
             'national_id' => ['required', 'string', 'max:255'],
-            'company_id' => ['required', 'string', 'max:255'],
-            'team_id' => ['required', 'string', 'max:255'],
+            'company_id' => ['required', 'exists:companies,id'],
+            'team_id' => ['required', 'exists:teams,id'],
         ]);
 
         if ($validator->fails()) {

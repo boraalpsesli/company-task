@@ -115,4 +115,53 @@ class CompanyService
             'message' => 'Company deleted successfully'
         ];
     }
+
+    public function getStatistics($id)
+    {
+        $company = Company::find($id);
+
+        if (!$company) {
+            return [
+                'success' => false,
+                'message' => 'Company not found'
+            ];
+        }
+
+        $stats = [
+            'total_users' => $company->users()->count(),
+            'total_teams' => $company->teams()->count(),
+            'teams_with_users' => $company->teams()
+                ->whereHas('users')
+                ->count(),
+            'teams_without_users' => $company->teams()
+                ->whereDoesntHave('users')
+                ->count(),
+            'total_transactions' => $company->sentTransactions()->count() + $company->receivedTransactions()->count(),
+            'sent_transactions' => $company->sentTransactions()->count(),
+            'received_transactions' => $company->receivedTransactions()->count(),
+        ];
+
+        return [
+            'success' => true,
+            'statistics' => $stats
+        ];
+    }
+
+    public function getAllStatistics()
+    {
+        $stats = [
+            'total_companies' => Company::count(),
+            'total_users' => Company::join('users', 'companies.id', '=', 'users.company_id')->count(),
+            'total_teams' => Company::join('teams', 'companies.id', '=', 'teams.company_id')->count(),
+            'companies_with_users' => Company::whereHas('users')->count(),
+            'companies_without_users' => Company::whereDoesntHave('users')->count(),
+            'companies_with_teams' => Company::whereHas('teams')->count(),
+            'companies_without_teams' => Company::whereDoesntHave('teams')->count(),
+        ];
+
+        return [
+            'success' => true,
+            'statistics' => $stats
+        ];
+    }
 } 
