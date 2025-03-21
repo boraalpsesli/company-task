@@ -36,6 +36,12 @@ return [
     */
 
     'mailers' => [
+        'mailtrap' => [
+            'transport' => 'mailtrap',
+            'host' => env('MAILTRAP_HOST'),
+            'key' => env('MAILTRAP_API_KEY'),
+            'inbox_id' => env('MAILTRAP_INBOX_ID'),
+        ],
 
         'smtp' => [
             'transport' => 'smtp',

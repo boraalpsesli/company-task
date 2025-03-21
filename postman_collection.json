@@ -5,7 +5,7 @@
     },
     "item": [
         {
-            "name": "Login",
+            "name": "Login (Send OTP)",
             "request": {
                 "method": "POST",
                 "header": [
@@ -26,6 +26,31 @@
                     "raw": "{{base_url}}/api/login",
                     "host": ["{{base_url}}"],
                     "path": ["api", "login"]
+                }
+            }
+        },
+        {
+            "name": "Verify OTP",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"test@example.com\",\n    \"otp\": \"123456\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/login/otp/verify",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "login", "otp", "verify"]
                 }
             }
         }

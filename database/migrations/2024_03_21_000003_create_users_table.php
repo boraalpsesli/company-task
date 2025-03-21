@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('national_id');
             $table->foreignId('company_id')->constrained()->onDelete('restrict');
             $table->foreignId('team_id')->constrained()->onDelete('restrict');
+            $table->string('otp')->nullable();
+            $table->timestamp('otp_expires_at')->nullable();
             $table->timestamps();
         });
     }

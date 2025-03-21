@@ -15,7 +15,7 @@ class TeamService
             'name' => 'required|string|max:255',
             'company_id' => 'required|exists:companies,id'
         ]);
-
+        
         if ($validator->fails()) {
             return [
                 'success' => false,

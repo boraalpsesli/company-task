@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
+use App\Notifications\LoginOppNotification;
+use Illuminate\Support\Facades\Notification;
+
 
 class UserService
 {
@@ -32,17 +35,24 @@ class UserService
             ];
         }
 
+        // Instead of generating token here, send OTP
         $user = Auth::user();
-        $token = $user->createToken(
-            name: 'personal-token',
-            expiresAt: now()->addDay(),
-            abilities: $user->getAllPermissions()->pluck('name')->toArray()
-        )->plainTextToken;
+        return $this->sendOtp($user);
+    }
 
+    private function sendOtp($user)
+    {
+        $otp = rand(100000, 999999);
+        $user->update([
+            'otp' => $otp,
+            'otp_expires_at' => now()->addMinutes(10)
+        ]);
+
+        $user->notify(new LoginOppNotification($otp));
         return [
             'success' => true,
-            'token' => $token,
-            'user' => $user->load('permissions')
+            'message' => 'OTP sent successfully. Please verify to complete login.',
+            'email' => $user->email
         ];
     }
 
@@ -101,6 +111,63 @@ class UserService
         return [
             'success' => true,
             'user' => $user
+        ];
+    }
+
+    public function verifyOtp(array $data)
+    {
+        $validator = Validator::make($data, [
+            'email' => ['required', 'email'],
+            'otp' => ['required', 'numeric', 'digits:6'],
+        ]);
+        if ($validator->fails()) {
+            return [
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ];
+        }
+
+        $user = User::where('email', $data['email'])->first();
+        if (!$user) {
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
+        }
+
+        if ($user->otp !== $data['otp']) {
+            return [
+                'success' => false,
+                'message' => 'Invalid OTP'
+            ];
+        }
+
+        if ($user->otp_expires_at < now()) {
+            return [
+                'success' => false,
+                'message' => 'OTP has expired'
+            ];
+        }
+
+        // Clear OTP after successful verification
+        $user->update([
+            'otp' => null,
+            'otp_expires_at' => null
+        ]);
+
+        // Generate token only after OTP verification
+        $token = $user->createToken(
+            name: 'personal-token',
+            expiresAt: now()->addDay(),
+            abilities: $user->getAllPermissions()->pluck('name')->toArray()
+        )->plainTextToken;
+
+        return [
+            'success' => true,
+            'message' => 'Login successful',
+            'token' => $token,
+            'user' => $user->load('permissions')
         ];
     }
 

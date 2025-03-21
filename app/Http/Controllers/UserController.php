@@ -28,8 +28,8 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'token' => $result['token'],
-            'user' => $result['user']
+            'message' => $result['message'],
+            'email' => $result['email']
         ], 200);
     }
 
@@ -190,5 +190,23 @@ class UserController extends Controller
             'can_view_users' => $user->can('view users'),
             'can_manage_users' => $user->can('manage users')
         ]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $result = $this->userService->verifyOtp($request->all());
+        
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'errors' => $result['errors'] ?? null
+            ], 401);
+        }
+
+        return response()->json([
+            'message' => $result['message'],
+            'token' => $result['token'],
+            'user' => $result['user']
+        ], 200);
     }
 }

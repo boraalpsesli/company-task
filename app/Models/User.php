@@ -20,6 +20,8 @@ class User extends Authenticatable
         'national_id',
         'company_id',
         'team_id',
+        'otp',
+        'otp_expires_at'
     ];
 
     protected $hidden = [
