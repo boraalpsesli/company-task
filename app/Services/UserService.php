@@ -78,4 +78,95 @@ class UserService
             'user' => $user
         ];
     }
+
+    public function getUser($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
+        }
+
+        return [
+            'success' => true,
+            'user' => $user
+        ];
+    }
+
+    public function updateUser($id, array $data)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
+        }
+
+        $validator = Validator::make($data, [
+            'email' => ['email', 'unique:users,email,' . $id],
+            'password' => ['min:8'],
+            'name' => ['string', 'max:255'],
+            'national_id' => ['string', 'max:255'],
+            'company_id' => ['string', 'max:255'],
+            'team_id' => ['string', 'max:255'],
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ];
+        }
+
+        $updateData = array_filter($data, function($value) {
+            return !is_null($value);
+        });
+
+        if (isset($updateData['password'])) {
+            $updateData['password'] = Hash::make($updateData['password']);
+        }
+
+        $user->update($updateData);
+
+        return [
+            'success' => true,
+            'message' => 'User updated successfully',
+            'user' => $user
+        ];
+    }
+
+    public function deleteUser($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
+        }
+
+        $user->delete();
+
+        return [
+            'success' => true,
+            'message' => 'User deleted successfully'
+        ];
+    }
+
+    public function getAllUsers($perPage = 10)
+    {
+        $users = User::paginate($perPage);
+
+        return [
+            'success' => true,
+            'users' => $users
+        ];
+    }
 } 
