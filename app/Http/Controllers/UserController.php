@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -26,7 +27,8 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'token' => $result['token']
+            'token' => $result['token'],
+            'user' => $result['user']
         ], 200);
     }
 
@@ -49,6 +51,15 @@ class UserController extends Controller
 
     public function show($id)
     {
+        $user = Auth::user();
+        
+        // Check if user is viewing their own profile or has admin permission
+        if ($user->id != $id && !$user->can('manage users')) {
+            return response()->json([
+                'message' => 'Unauthorized to view this user'
+            ], 403);
+        }
+
         $result = $this->userService->getUser($id);
 
         if (!$result['success']) {
@@ -64,6 +75,15 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
+        $user = Auth::user();
+        
+        // Check if user is updating their own profile or has admin permission
+        if ($user->id != $id && !$user->can('manage users')) {
+            return response()->json([
+                'message' => 'Unauthorized to update this user'
+            ], 403);
+        }
+
         $result = $this->userService->updateUser($id, $request->all());
 
         if (!$result['success']) {
@@ -81,6 +101,15 @@ class UserController extends Controller
 
     public function destroy($id)
     {
+        $user = Auth::user();
+        
+        // Only admin can delete users
+        if (!$user->can('manage users')) {
+            return response()->json([
+                'message' => 'Unauthorized to delete users'
+            ], 403);
+        }
+
         $result = $this->userService->deleteUser($id);
 
         if (!$result['success']) {
@@ -96,6 +125,15 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
+        $user = Auth::user();
+        
+        // Only admin can view all users
+        if (!$user->can('manage users')) {
+            return response()->json([
+                'message' => 'Unauthorized to view all users'
+            ], 403);
+        }
+
         $perPage = $request->query('per_page', 10);
         $result = $this->userService->getAllUsers($perPage);
 

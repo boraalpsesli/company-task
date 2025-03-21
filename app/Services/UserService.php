@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class UserService
 {
@@ -35,12 +36,13 @@ class UserService
         $token = $user->createToken(
             name: 'personal-token',
             expiresAt: now()->addDay(),
-            abilities: ['*']
+            abilities: $user->getAllPermissions()->pluck('name')->toArray()
         )->plainTextToken;
 
         return [
             'success' => true,
-            'token' => $token
+            'token' => $token,
+            'user' => $user->load('roles', 'permissions')
         ];
     }
 
@@ -72,16 +74,22 @@ class UserService
             'team_id' => $data['team_id'],
         ]);
 
+        // Assign default user role
+        $userRole = Role::where('name', 'user')->first();
+        if ($userRole) {
+            $user->assignRole($userRole);
+        }
+
         return [
             'success' => true,
             'message' => 'User created successfully',
-            'user' => $user
+            'user' => $user->load('roles', 'permissions')
         ];
     }
 
     public function getUser($id)
     {
-        $user = User::find($id);
+        $user = User::with('roles', 'permissions')->find($id);
 
         if (!$user) {
             return [
@@ -114,6 +122,7 @@ class UserService
             'national_id' => ['string', 'max:255'],
             'company_id' => ['string', 'max:255'],
             'team_id' => ['string', 'max:255'],
+            'role' => ['string', 'exists:roles,name']
         ]);
 
         if ($validator->fails()) {
@@ -132,12 +141,18 @@ class UserService
             $updateData['password'] = Hash::make($updateData['password']);
         }
 
+        // Handle role update if provided
+        if (isset($updateData['role'])) {
+            $user->syncRoles([$updateData['role']]);
+            unset($updateData['role']);
+        }
+
         $user->update($updateData);
 
         return [
             'success' => true,
             'message' => 'User updated successfully',
-            'user' => $user
+            'user' => $user->load('roles', 'permissions')
         ];
     }
 
@@ -162,7 +177,7 @@ class UserService
 
     public function getAllUsers($perPage = 10)
     {
-        $users = User::paginate($perPage);
+        $users = User::with('roles', 'permissions')->paginate($perPage);
 
         return [
             'success' => true,
