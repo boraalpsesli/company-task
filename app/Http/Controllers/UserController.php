@@ -46,4 +46,61 @@ class UserController extends Controller
             'user' => $result['user']
         ], 201);
     }
+
+    public function show($id)
+    {
+        $result = $this->userService->getUser($id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message']
+            ], 404);
+        }
+
+        return response()->json([
+            'user' => $result['user']
+        ], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $result = $this->userService->updateUser($id, $request->all());
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'errors' => $result['errors'] ?? null
+            ], $result['errors'] ? 422 : 404);
+        }
+
+        return response()->json([
+            'message' => $result['message'],
+            'user' => $result['user']
+        ], 200);
+    }
+
+    public function destroy($id)
+    {
+        $result = $this->userService->deleteUser($id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message']
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => $result['message']
+        ], 200);
+    }
+
+    public function index(Request $request)
+    {
+        $perPage = $request->query('per_page', 10);
+        $result = $this->userService->getAllUsers($perPage);
+
+        return response()->json([
+            'users' => $result['users']
+        ], 200);
+    }
 }
