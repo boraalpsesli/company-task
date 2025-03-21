@@ -25,10 +25,18 @@ class Team extends Model
     }
 
     /**
-     * Get all users in this team.
+     * Get the users in the team.
      */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * Get the transactions for the team.
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

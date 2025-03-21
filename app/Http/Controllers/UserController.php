@@ -179,4 +179,16 @@ class UserController extends Controller
             'user' => $result['user']
         ], 200);
     }
+
+    public function checkPermissions()
+    {
+        $user = Auth::user();
+        
+        return response()->json([
+            'user' => $user->name,
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'can_view_users' => $user->can('view users'),
+            'can_manage_users' => $user->can('manage users')
+        ]);
+    }
 }

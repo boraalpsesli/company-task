@@ -19,13 +19,35 @@ class RoleSeeder extends Seeder
 
         // Create permissions
         $permissions = [
+            // User permissions
             'manage users',
             'view users',
             'create users',
             'edit users',
             'delete users',
             'view own profile',
-            'edit own profile'
+            'edit own profile',
+
+            // Company permissions
+            'manage companies',
+            'view companies',
+            'create companies',
+            'edit companies',
+            'delete companies',
+
+            // Team permissions
+            'manage teams',
+            'view teams',
+            'create teams',
+            'edit teams',
+            'delete teams',
+
+            // Transaction permissions
+            'manage transactions',
+            'view transactions',
+            'create transactions',
+            'edit transactions',
+            'delete transactions'
         ];
 
         foreach ($permissions as $permission) {
@@ -36,13 +58,35 @@ class RoleSeeder extends Seeder
         $adminUser = User::find(12);
         if ($adminUser) {
             $adminUser->givePermissionTo([
+                // User permissions
                 'manage users',
                 'view users',
                 'create users',
                 'edit users',
                 'delete users',
                 'view own profile',
-                'edit own profile'
+                'edit own profile',
+
+                // Company permissions
+                'manage companies',
+                'view companies',
+                'create companies',
+                'edit companies',
+                'delete companies',
+
+                // Team permissions
+                'manage teams',
+                'view teams',
+                'create teams',
+                'edit teams',
+                'delete teams',
+
+                // Transaction permissions
+                'manage transactions',
+                'view transactions',
+                'create transactions',
+                'edit transactions',
+                'delete transactions'
             ]);
         }
 
