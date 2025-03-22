@@ -28,6 +28,11 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
+    'tc_kimlik' => [
+        'api_key' => env('TC_KIMLIK_API_KEY'),
+        'api_url' => env('TC_KIMLIK_API_URL', 'https://tckimlik.nvi.gov.tr/Service/KPSPublic.asmx'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

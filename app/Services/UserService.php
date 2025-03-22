@@ -62,7 +62,9 @@ class UserService
             'email' => ['required', 'email', 'unique:users'],
             'password' => ['required', 'min:8'],
             'name' => ['required', 'string', 'max:255'],
-            'national_id' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
+            'national_id' => ['required', 'string', 'max:11', 'min:11'],
+            'birth_year' => ['required', 'integer', 'min:1900', 'max:' . date('Y')],
             'company_id' => ['required', 'exists:companies,id'],
             'team_id' => ['required', 'exists:teams,id'],
         ]);
@@ -79,7 +81,9 @@ class UserService
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'name' => $data['name'],
+            'surname' => $data['surname'],
             'national_id' => $data['national_id'],
+            'birth_year' => $data['birth_year'],
             'company_id' => $data['company_id'],
             'team_id' => $data['team_id'],
         ]);

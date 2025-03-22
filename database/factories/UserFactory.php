@@ -29,10 +29,12 @@ class UserFactory extends Factory
         $team = Team::where('company_id', $company->id)->inRandomOrder()->first();
 
         return [
-            'name' => fake()->name(),
+            'name' => fake()->firstName(),
+            'surname' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'password' => Hash::make('password'),
-            'national_id' => fake()->numerify('##########'),
+            'national_id' => fake()->numerify('###########'),
+            'birth_year' => fake()->numberBetween(1950, 2000),
             'company_id' => $company->id,
             'team_id' => $team->id,
         ];

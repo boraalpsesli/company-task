@@ -17,9 +17,11 @@ class UserSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'name' => 'Admin User',
+                'name' => 'Admin',
+                'surname' => 'User',
                 'password' => bcrypt('password'),
-                'national_id' => '1234567890',
+                'national_id' => '12345678901',
+                'birth_year' => 1990,
                 'company_id' => $adminTeam->company_id,
                 'team_id' => $adminTeam->id,
             ]

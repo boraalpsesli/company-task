@@ -10,7 +10,7 @@ use App\Http\Controllers\TransactionController;
 // Public routes
 Route::post('/login', [UserController::class, 'login'])->middleware('guest');
 Route::post('/login/otp/verify', [UserController::class, 'verifyOtp'])->middleware('guest');
-Route::post('/register', [UserController::class, 'register'])->middleware('guest');
+Route::post('/register', [UserController::class, 'register'])->middleware(['guest', \App\Http\Middleware\VerifyTurkishNationalId::class]);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
