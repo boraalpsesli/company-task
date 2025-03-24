@@ -12,9 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append([
-            \App\Http\Middleware\VerifyTurkishNationalId::class
-        ]);
+        // Global middleware removed - TC Kimlik verification is now only on registration route
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

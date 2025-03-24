@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserDownloadController;
 
 // Public routes
 Route::post('/login', [UserController::class, 'login'])->middleware('guest');
@@ -39,6 +40,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Transaction routes
     Route::apiResource('transactions', TransactionController::class);
+
+    // User Download Routes
+    Route::prefix('users')->group(function () {
+        Route::post('/download', [UserController::class, 'download']);
+        Route::get('/exports', [UserController::class, 'listExports']);
+    });
 });
 
 
